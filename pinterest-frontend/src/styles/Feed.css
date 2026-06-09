@@ -1,0 +1,10 @@
+.feed-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.masonry {
+  columns: 4;
+  column-gap: 20px;
+}
