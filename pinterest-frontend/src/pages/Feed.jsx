@@ -1,11 +1,42 @@
-import React from 'react';
+import PostCard from "../components/PostCard";
+import Navbar from "../components/Navbar";
+import "../styles/Feed.css";
 
 function Feed() {
+  //Post fake para probar
+const posts = [
+  {
+    id: 1,
+    author: "Leonardo",
+    text: "La disciplina supera a la motivación."
+  },
+  {
+    id: 2,
+    author: "Ana",
+    text: "Hoy aprendí React."
+  },
+  {
+    id: 3,
+    author: "Carlos",
+    text: "Pensamiento corto."
+  }
+];
+
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Feed Principal (Estilo Pinterest)</h1>
-      <p>Aquí se renderizará la cuadrícula de imágenes.</p>
-    </div>
+    <>
+      <Navbar></Navbar>
+      <div className="feed-container">
+        <div className="masonry">
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              author={post.author}
+              text={post.text}
+            />
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
 
