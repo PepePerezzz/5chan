@@ -9,20 +9,19 @@ import AdminDashboard from './pages/AdminDashboard';
 function App() {
   return (
     <BrowserRouter>
-      {/* Aquí pueden colocar un componente <Navbar /> global si lo desean */}
       <Routes>
-        {/* Rutas Públicas */}
+        //Rutas Públicas
         <Route path="/" element={<Feed />} />
         <Route path="/login" element={<Login />} />
         
-        {/* Ruta con parámetros dinámicos (:id) para ver un pin a detalle */}
+        //Ruta con parámetros dinamicos (:id) para ver un pin a detalle
         <Route path="/pin/:id" element={<PinDetail />} />
 
-        {/* Rutas Privadas/Protegidas (Por ahora accesibles) */}
+        //Rutas Privadas/Protegidas 
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<AdminDashboard />} />
 
-        {/* Manejo de error 404 por si escriben una URL rota */}
+        //Manejo de error 404 por si escriben una URL rota
         <Route path="*" element={<div style={{ padding: '20px' }}><h2>404 - Página No Encontrada 😢</h2></div>} />
       </Routes>
     </BrowserRouter>
