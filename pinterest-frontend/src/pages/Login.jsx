@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -10,15 +10,36 @@ function Login() {
     const { login } = useAuth();
     const navigate = useNavigate();
 
+    const emailInputRef = useRef(null);
+    const cardRef = useRef(null);
+
+
+    useEffect(() => {
+        if (emailInputRef.current) {
+            emailInputRef.current.focus();
+        }
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+     
+        if (!correo.trim() || !password.trim()) {
+            if (cardRef.current) {
+                cardRef.current.style.animation = "shake 0.4s ease-in-out";
+                cardRef.current.style.borderColor = "#c0392b";
+                setTimeout(() => {
+                    cardRef.current.style.animation = "";
+                }, 400);
+            }
+            alert("Por favor rellena todos los campos vacíos.");
+            return;
+        }
+
         try {
             const response = await axios.post(
                 "http://localhost:3000/api/auth/login",
-                {
-                    correo,
-                    password
-                }
+                { correo, password }
             );
             login(
                 response.data.usuario,
@@ -26,6 +47,11 @@ function Login() {
             );
             navigate("/");
         } catch (error) {
+            
+            if (cardRef.current) {
+                cardRef.current.style.transform = "scale(0.98)";
+                setTimeout(() => cardRef.current.style.transform = "none", 150);
+            }
             alert(
                 error.response?.data?.mensaje ||
                 "Error al iniciar sesión"
@@ -35,7 +61,7 @@ function Login() {
 
     return (
         <div className="login-page">
-            <div className="login-card">
+            <div className="login-card" ref={cardRef} style={{ transition: "all 0.3s ease" }}>
                 <Link to="/" className="back-btn">
                     ← Volver al Feed
                 </Link>
@@ -47,22 +73,19 @@ function Login() {
                 </p>
                 <form onSubmit={handleSubmit}>
                     <input
+                        ref={emailInputRef} 
                         className="login-input"
                         type="email"
                         placeholder="Correo electrónico"
                         value={correo}
-                        onChange={(e) =>
-                            setCorreo(e.target.value)
-                        }
+                        onChange={(e) => setCorreo(e.target.value)}
                     />
                     <input
                         className="login-input"
                         type="password"
                         placeholder="Contraseña"
                         value={password}
-                        onChange={(e) =>
-                            setPassword(e.target.value)
-                        }
+                        onChange={(e) => setPassword(e.target.value)}
                     />
 
                     <button
@@ -72,7 +95,7 @@ function Login() {
                         Iniciar sesión
                     </button>
                     <Link to="/register" className="register-btn">
-                     Crear una cuenta
+                       Crear una cuenta
                     </Link>
                 </form>
             </div>
