@@ -5,6 +5,8 @@ const cors = require("cors");
 const app = express();
 const authRoutes = require("./routes/authRoutes");
 const pinRoutes = require("./routes/pinRoutes");
+const userRoutes = require("./routes/userRoutes");
+
 
 app.use(cors());
 app.use(express.json());
@@ -15,6 +17,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/pins", pinRoutes);
+app.use("/api/users", userRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log(`Servidor en puerto ${process.env.PORT}`);

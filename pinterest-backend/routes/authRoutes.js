@@ -1,5 +1,5 @@
 const express = require("express");
-
+const authorizeRoles = require("../middleware/authorizeRoles");
 const router = express.Router();
 const verificarToken = require("../middleware/authMiddleware");
 const {
@@ -21,6 +21,7 @@ router.get(
 
     }
 );
+
 
 module.exports = router;
 
