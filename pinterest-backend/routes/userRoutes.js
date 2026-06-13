@@ -3,36 +3,25 @@ const router = express.Router();
 
 const verificarToken = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/authorizeRoles");
-
 const {
-    getPins,
-    createPin,
-    deletePin,
-} = require("../controllers/pinController");
+    getUsers,
+    deleteUser
+} = require("../controllers/userController");
 
-// público (feed)
-router.get("/", getPins);
-
-// protegido (crear pins)
-router.post(
-    "/",
-    verificarToken,
-    authorizeRoles("usuario", "admin"),
-    createPin
-);
+// SOLO ADMIN
 
 router.get(
-  "/admin",
+  "/",
   verificarToken,
   authorizeRoles("admin"),
-  getPins
+  getUsers
 );
 
 router.delete(
   "/:id",
   verificarToken,
   authorizeRoles("admin"),
-  deletePin
+  deleteUser
 );
 
 module.exports = router;

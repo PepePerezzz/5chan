@@ -39,8 +39,29 @@ const createPin = async (req, res) => {
         });
     }
 };
+// ELIMINAR PIN (ADMIN)
+const deletePin = (req, res) => {
+    
+    const { id } = req.params;
+
+    const sql = "DELETE FROM pines WHERE id_pin = ?";
+
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                mensaje: "Error al eliminar pin",
+                err
+            });
+        }
+
+        res.json({
+            mensaje: "Pin eliminado correctamente"
+        });
+    });
+};
 
 module.exports = {
     getPins,
-    createPin
+    createPin,
+    deletePin
 };
