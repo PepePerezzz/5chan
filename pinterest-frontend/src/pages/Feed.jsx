@@ -4,12 +4,13 @@ import PostCard from "../components/PostCard";
 import Navbar from "../components/Navbar";
 import CreatePinModal from "../components/CreatePinModal";
 import "../styles/Feed.css";
+import { useAuth } from "../context/AuthContext";
 
 function Feed() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const { user } = useAuth();
   //useEffect para pedir los textos al Backend en cuanto cargue la pagina
   useEffect(() => {
     //Axios con una Promesa (.then / .catch)
@@ -39,25 +40,36 @@ function Feed() {
 
 
 const handleCreatePost = async (newPostData) => {
-    try {
-      const datosParaBD = {
-        categoria: newPostData.category,
-        descripcion: newPostData.description,
-        texto: newPostData.text
-      };
+  try {
 
-      const respuesta = await axios.post('http://localhost:3000/api/pins', datosParaBD);
-      
-      const postGuardado = respuesta.data;
-      setPosts([postGuardado, ...posts]);
-      
-      alert("¡Pensamiento guardado con éxito en MySQL! 📌");
+    const datosParaBD = {
+      categoria: newPostData.category,
+      descripcion: newPostData.description,
+      texto: newPostData.text
+    };
 
-    } catch (error) {
-      console.error("Error al guardar en la base de datos:", error);
-      alert("Error: No se pudo conectar con el servidor o falló el guardado.");
-    }
-  };
+    const token = localStorage.getItem("token");
+
+    const respuesta = await axios.post(
+      "http://localhost:3000/api/pins",
+      datosParaBD,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const postGuardado = respuesta.data;
+    setPosts([postGuardado, ...posts]);
+
+    alert("¡Pensamiento guardado con éxito en MySQL! 📌");
+
+  } catch (error) {
+    console.error("Error al guardar en la base de datos:", error);
+    alert("Error: No se pudo conectar con el servidor o falló el guardado.");
+  }
+};
 
 return (
     // un div relativo para que el boton pueda flotar
@@ -78,20 +90,23 @@ return (
       </div>
 
       {/* 4. BOTÓN FLOTANTE: Diseñado con CSS en línea para no alterar el archivo Feed.css de tu compañero */}
-      <button 
-        style={floatingButtonStyle} 
-        onClick={() => setIsModalOpen(true)}
-        title="Crear nuevo pin de texto"
-      >
-        +
-      </button>
+      {user && (
+        <>
+          <button
+            style={floatingButtonStyle}
+            onClick={() => setIsModalOpen(true)}
+            title="Crear nuevo pin de texto"
+          >
+            +
+          </button>
 
-      {/* 5. COMPONENTE MODAL: Oculto por defecto, se activa con el botón */}
-      <CreatePinModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onCreatePin={handleCreatePost}
-      />
+          <CreatePinModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onCreatePin={handleCreatePost}
+          />
+        </>
+      )}
     </div>
   );
 }

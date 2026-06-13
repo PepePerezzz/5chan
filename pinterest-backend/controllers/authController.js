@@ -5,94 +5,86 @@ const User = require("../models/userModel");
 const register = async (req, res) => {
 
     try {
-        const { nombre, correo, password } = req.body;
-        if (!nombre || !correo || !password) {
 
+        const { nombre, correo, password } = req.body;
+
+        if (!nombre || !correo || !password) {
             return res.status(400).json({
                 mensaje: "Todos los campos son obligatorios"
             });
-
         }
 
-        User.buscarPorCorreo(correo, async (err, results) => {
-            if (err) {
-                return res.status(500).json(err);
-            }
+        const results = await User.buscarPorCorreo(correo);
 
-            if (results.length > 0) {
+        if (results.length > 0) {
+            return res.status(400).json({
+                mensaje: "El correo ya existe"
+            });
+        }
 
-                return res.status(400).json({
-                    mensaje: "El correo ya existe"
-                });
+        const hashedPassword = await bcrypt.hash(
+            password,
+            10
+        );
 
-            }
-            const hashedPassword =
-                await bcrypt.hash(password, 10);
+        await User.crearUsuario(
+            nombre,
+            correo,
+            hashedPassword,
+            "usuario"
+        );
 
-            User.crearUsuario(
-                nombre,
-                correo,
-                hashedPassword,
-                "usuario",
-                (err, result) => {
-
-                    if (err) {
-                        return res.status(500).json(err);
-                    }
-
-                    res.status(201).json({
-                        mensaje: "Usuario registrado"
-                    });
-
-                }
-            );
-
+        res.status(201).json({
+            mensaje: "Usuario registrado"
         });
 
     } catch (error) {
 
-        res.status(500).json(error);
+        console.error(error);
+
+        res.status(500).json({
+            mensaje: "Error del servidor"
+        });
 
     }
 
 };
 
-const login = (req, res) => {
-    const { correo, password } = req.body;
-    if (!correo || !password) {
+const login = async (req, res) => {
 
-        return res.status(400).json({
-            mensaje: "Todos los campos son obligatorios"
-        });
+    try {
 
-    }
+        const { correo, password } = req.body;
 
-    User.buscarPorCorreo(correo, async (err, results) => {
-
-        if (err) {
-            return res.status(500).json(err);
+        if (!correo || !password) {
+            return res.status(400).json({
+                mensaje: "Todos los campos son obligatorios"
+            });
         }
-        if (results.length === 0) {
 
+        const results = await User.buscarPorCorreo(
+            correo
+        );
+
+        if (results.length === 0) {
             return res.status(404).json({
                 mensaje: "Usuario no encontrado"
             });
-
         }
 
         const usuario = results[0];
+
         const coincide = await bcrypt.compare(
             password,
             usuario.contraseña
         );
 
         if (!coincide) {
-
             return res.status(401).json({
                 mensaje: "Contraseña incorrecta"
             });
-
         }
+
         const token = jwt.sign(
             {
                 id: usuario.id_usuario,
@@ -115,7 +107,15 @@ const login = (req, res) => {
             }
         });
 
-    });
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            mensaje: "Error del servidor"
+        });
+
+    }
 
 };
 
