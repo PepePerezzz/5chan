@@ -40,24 +40,31 @@ const createPin = async (req, res) => {
     }
 };
 // ELIMINAR PIN (ADMIN)
-const deletePin = (req, res) => {
-    
-    const { id } = req.params;
+const deletePin = async (req, res) => {
 
-    const sql = "DELETE FROM pines WHERE id_pin = ?";
+    try {
 
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            return res.status(500).json({
-                mensaje: "Error al eliminar pin",
-                err
-            });
-        }
+        const { id } = req.params;
+
+        await db.execute(
+            "DELETE FROM pines WHERE id_pin = ?",
+            [id]
+        );
 
         res.json({
             mensaje: "Pin eliminado correctamente"
         });
-    });
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            mensaje: "Error al eliminar pin"
+        });
+
+    }
+
 };
 
 module.exports = {
