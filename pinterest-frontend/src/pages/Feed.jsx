@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from "react"; 
-import axios from "axios";                         
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom"; 
+import axios from "axios";
 import PostCard from "../components/PostCard";
 import Navbar from "../components/Navbar";
 import CreatePinModal from "../components/CreatePinModal";
 import "../styles/Feed.css";
 import { useAuth } from "../context/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Feed() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   //useEffect para pedir los textos al Backend en cuanto cargue la pagina
   useEffect(() => {
     //Axios con una Promesa (.then / .catch)
@@ -27,9 +32,26 @@ function Feed() {
     console.error(error);
     setLoading(false);
   });
-  }, []); 
+  }, []);
 
-  //Renderizado condicional de carga: Si está cargando, muestra un mensaje
+  //useEffect para filtrar posts según el parámetro de búsqueda
+  useEffect(() => {
+    const busqueda = searchParams.get('busqueda');
+
+    if (!busqueda || busqueda.trim() === '') {
+      //Si no hay parámetro de búsqueda, mostrar todos los posts
+      setFilteredPosts(posts);
+    } else {
+      //Filtrar posts donde categoria, descripcion o texto contenga el término de búsqueda
+      const termino = busqueda.toLowerCase();
+      const resultados = posts.filter(post =>
+        post.categoria.toLowerCase().includes(termino) ||
+        post.descripcion.toLowerCase().includes(termino) ||
+        post.texto.toLowerCase().includes(termino)
+      );
+      setFilteredPosts(resultados);
+    }
+  }, [searchParams, posts]);
   if (loading) {
     return (
       <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -63,11 +85,21 @@ const handleCreatePost = async (newPostData) => {
     const postGuardado = respuesta.data;
     setPosts([postGuardado, ...posts]);
 
-    alert("¡Pensamiento guardado con éxito en MySQL! 📌");
+    toast.success("¡Pensamiento guardado con exito!", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+    });
 
   } catch (error) {
     console.error("Error al guardar en la base de datos:", error);
-    alert("Error: No se pudo conectar con el servidor o falló el guardado.");
+    toast.error("Error: No se pudo conectar con el servidor o falló el guardado.", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+    });
   }
 };
 
@@ -75,17 +107,26 @@ return (
     // un div relativo para que el boton pueda flotar
     <div style={{ position: "relative", minHeight: "100vh" }}>
       <Navbar />
-      
+      <ToastContainer />
+
       <div className="feed-container">
         <div className="masonry">
-          {posts.map((post) => (
-            <PostCard
-              key={post.id_pin}       
-              author={post.categoria}  
-              category={post.descripcion} 
-              text={post.texto}        
-            />
-          ))}
+          {filteredPosts.length > 0 ? (
+            filteredPosts.map((post) => (
+              <PostCard
+                key={post.id_pin}
+                author={post.categoria}
+                category={post.descripcion}
+                text={post.texto}
+              />
+            ))
+          ) : (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 20px' }}>
+              <p style={{ fontSize: '18px', color: '#999' }}>
+                {searchParams.get('busqueda') ? 'No se encontraron resultados' : 'No hay publicaciones'}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
