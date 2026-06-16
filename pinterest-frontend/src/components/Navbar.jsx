@@ -1,29 +1,68 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/Navbar.css";
 
 function Navbar() {
 
   const { user, logout } = useAuth();
   const [openMenu, setOpenMenu] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const toggleMenu = () => {
     setOpenMenu(!openMenu);
   };
 
+  const handleInputChange = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      navigate(`/?busqueda=${encodeURIComponent(searchValue)}`);
+    }
+  };
+
+  const handleLogoClick = () => {
+    setSearchValue("");
+    navigate("/");
+  };
+
+  const handleReset = () => {
+    setSearchValue("");
+    setSearchParams({});
+    navigate("/");
+  };
+
   return (
     <nav className="navbar">
 
-      <Link to="/" className="logo">
+      <Link to="/" className="logo" onClick={handleLogoClick}>
         5Chan
       </Link>
 
-      <input
-        className="search-input"
-        type="text"
-        placeholder="Buscar publicaciones..."
-      />
+      <div className="search-container">
+        <form onSubmit={handleSearch} className="search-form">
+          <input
+            className="search-input"
+            type="text"
+            placeholder="Buscar publicaciones..."
+            value={searchValue}
+            onChange={handleInputChange}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
+          />
+        </form>
+        <button
+          className="reset-btn"
+          onClick={handleReset}
+          title="Limpiar búsqueda y mostrar todas las publicaciones"
+        >
+          ✕
+        </button>
+      </div>
 
       <div className="navbar-right">
 
