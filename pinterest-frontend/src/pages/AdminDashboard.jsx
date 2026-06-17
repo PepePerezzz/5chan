@@ -3,8 +3,10 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import "../styles/AdminDashboard.css";
 
-function AdminDashboard() {
+import { FiUsers, FiLayers, FiTrash2 } from "react-icons/fi";
+import Swal from "sweetalert2";
 
+function AdminDashboard() {
     const [users, setUsers] = useState([]);
     const [pins, setPins] = useState([]);
 
@@ -34,23 +36,87 @@ function AdminDashboard() {
     };
 
     const deleteUser = async (id) => {
-        await axios.delete(`http://localhost:3000/api/users/${id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción revocará el acceso al usuario de forma permanente.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#e74c3c",
+            cancelButtonColor: "#8a7365",
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+            background: "#fcfbfa",
+            color: "#38291e"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await axios.delete(`http://localhost:3000/api/users/${id}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    setUsers(users.filter(u => u.id_usuario !== id));
+                    
+                    Swal.fire({
+                        title: "¡Eliminado!",
+                        text: "La cuenta del usuario ha sido dada de baja correctamente.",
+                        icon: "success",
+                        confirmButtonColor: "#b97843",
+                        background: "#fcfbfa",
+                        color: "#38291e"
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "No se pudo eliminar al usuario.",
+                        icon: "error",
+                        confirmButtonColor: "#b97843"
+                    });
+                }
             }
         });
-
-        setUsers(users.filter(u => u.id_usuario !== id));
     };
 
     const deletePin = async (id) => {
-        await axios.delete(`http://localhost:3000/api/pins/${id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
+        Swal.fire({
+            title: "¿Retirar publicación?",
+            text: "El pin se eliminará permanentemente de la galería de 5Chan.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#e74c3c",
+            cancelButtonColor: "#8a7365",
+            confirmButtonText: "Sí, retirar",
+            cancelButtonText: "Cancelar",
+            background: "#fcfbfa",
+            color: "#38291e"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await axios.delete(`http://localhost:3000/api/pins/${id}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    setPins(pins.filter(p => p.id_pin !== id));
+
+                    Swal.fire({
+                        title: "¡Contenido Retirado!",
+                        text: "El pin ha sido purgado con éxito.",
+                        icon: "success",
+                        confirmButtonColor: "#b97843",
+                        background: "#fcfbfa",
+                        color: "#38291e"
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "No se pudo retirar el pin.",
+                        icon: "error",
+                        confirmButtonColor: "#b97843"
+                    });
+                }
             }
         });
-
-        setPins(pins.filter(p => p.id_pin !== id));
     };
 
     return (
@@ -58,43 +124,60 @@ function AdminDashboard() {
             <Navbar />
 
             <div className="admin-container">
+                <div className="admin-header-ghost">
+                    <div>
+                        <h1>Panel de Control</h1>
+                        <p>Administración general de la plataforma 5Chan</p>
+                    </div>
+                    <div className="admin-stats-overview">
+                        <div className="stat-box">
+                            <h4>Usuarios</h4>
+                            <p>{users.length}</p>
+                        </div>
+                        <div className="stat-box">
+                            <h4>Pins</h4>
+                            <p>{pins.length}</p>
+                        </div>
+                    </div>
+                </div>
 
-                {/* USERS */}
                 <section>
-                    <h2>Usuarios</h2>
+                    <h2>
+                        <FiUsers style={{ color: "#e67e22" }} /> Cuentas Registradas
+                    </h2>
                     <div className="grid">
                         {users.map(user => (
                             <div key={user.id_usuario} className="card">
                                 <h3>{user.nombre}</h3>
+                                <span>{user.rol || "Usuario"}</span>
                                 <p>{user.correo}</p>
-                                <span>{user.rol}</span>
 
                                 <button onClick={() => deleteUser(user.id_usuario)}>
-                                    Eliminar
+                                    <FiTrash2 /> Eliminar cuenta
                                 </button>
                             </div>
                         ))}
                     </div>
                 </section>
 
-                {/* PINS */}
                 <section>
-                    <h2>Pins</h2>
+                    <h2>
+                        <FiLayers style={{ color: "#9b59b6" }} /> Galería de Publicaciones
+                    </h2>
                     <div className="grid">
                         {pins.map(pin => (
                             <div key={pin.id_pin} className="card">
-                                <h3>{pin.categoria}</h3>
+                                <h3>{pin.categoria || "Idea"}</h3>
                                 <p>{pin.descripcion}</p>
                                 <p>{pin.texto}</p>
 
                                 <button onClick={() => deletePin(pin.id_pin)}>
-                                    Eliminar
+                                    <FiTrash2 /> Retirar Contenido
                                 </button>
                             </div>
                         ))}
                     </div>
                 </section>
-
             </div>
         </div>
     );
