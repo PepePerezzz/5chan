@@ -4,6 +4,9 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/Login.css";
 
+import { FiArrowLeft, FiLogIn, FiUserPlus } from "react-icons/fi";
+import Swal from "sweetalert2";
+
 function Login() {
     const [correo, setCorreo] = useState("");
     const [password, setPassword] = useState("");
@@ -26,10 +29,14 @@ function Login() {
             );
             navigate("/");
         } catch (error) {
-            alert(
-                error.response?.data?.mensaje ||
-                "Error al iniciar sesión"
-            );
+            Swal.fire({
+                title: "No se pudo iniciar sesión",
+                text: error.response?.data?.mensaje || "Verifica tus credenciales e intenta de nuevo.",
+                icon: "error",
+                confirmButtonColor: "#b97843",
+                background: "#fcfbfa",
+                color: "#38291e"
+            });
         }
     };
 
@@ -37,42 +44,41 @@ function Login() {
         <div className="login-page">
             <div className="login-card">
                 <Link to="/" className="back-btn">
-                    ← Volver al Feed
+                    <FiArrowLeft style={{ marginRight: "6px" }} /> Volver al Feed
                 </Link>
+                
                 <h1 className="login-title">
                     Bienvenido a 5Chan
                 </h1>
                 <p className="login-subtitle">
-                    Comparte ideas, pensamientos y reflexiones.
+                    Comparte ideas, pensamientos y reflexiones con toda la comunidad.
                 </p>
+                
                 <form onSubmit={handleSubmit}>
                     <input
                         className="login-input"
                         type="email"
                         placeholder="Correo electrónico"
                         value={correo}
-                        onChange={(e) =>
-                            setCorreo(e.target.value)
-                        }
+                        onChange={(e) => setCorreo(e.target.value)}
                     />
                     <input
                         className="login-input"
                         type="password"
                         placeholder="Contraseña"
                         value={password}
-                        onChange={(e) =>
-                            setPassword(e.target.value)
-                        }
+                        onChange={(e) => setPassword(e.target.value)}
                     />
 
                     <button
                         className="login-button"
                         type="submit"
                     >
-                        Iniciar sesión
+                        Iniciar sesión <FiLogIn style={{ marginLeft: "6px", verticalAlign: "middle" }} />
                     </button>
+                    
                     <Link to="/register" className="register-btn">
-                     Crear una cuenta
+                        <FiUserPlus style={{ marginRight: "6px" }} /> Crear una cuenta
                     </Link>
                 </form>
             </div>

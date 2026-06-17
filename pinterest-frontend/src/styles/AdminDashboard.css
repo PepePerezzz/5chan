@@ -1,163 +1,220 @@
+/* src/styles/AdminDashboard.css */
+
 .admin-container {
-    padding: 30px;
-    min-height: 100vh;
-
-    background: #0f0f0f;
-    color: white;
+  padding: 50px 60px;
+  min-height: 100vh;
+  background-color: #fcfbfa; /* Conecta suavemente con el fondo de tu Navbar */
+  color: #38291e;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Contenedor de bienvenida ejecutivo */
+.admin-header-ghost {
+  margin-bottom: 40px;
+  background: linear-gradient(135deg, #b97843 0%, #8a5329 100%);
+  padding: 35px 40px;
+  border-radius: 24px;
+  color: white;
+  box-shadow: 0 12px 30px rgba(185, 120, 67, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-header-ghost h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.admin-header-ghost p {
+  margin: 5px 0 0 0;
+  opacity: 0.9;
+  font-size: 1rem;
+}
+
+/* Indicadores de métricas flotantes en burbuja */
+.admin-stats-overview {
+  display: flex;
+  gap: 20px;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 15px 25px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  text-align: center;
+  min-width: 100px;
+}
+
+.stat-box h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #f5ece5;
+}
+
+.stat-box p {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff !important;
+}
+
+/* Títulos de sección dinámicos */
 .admin-container h2 {
-    margin: 30px 0 20px;
-
-    font-size: 28px;
-    font-weight: 700;
-
-    color: #b97843;
+  margin: 40px 0 24px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #5c4033;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
+/* Grid asimétrico */
 .grid {
-    display: grid;
-
-    grid-template-columns: repeat(
-        auto-fill,
-        minmax(280px, 1fr)
-    );
-
-    gap: 20px;
-
-    margin-bottom: 50px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 25px;
+  margin-bottom: 50px;
 }
 
+/* Tarjetas Dinámicas con personalidad de color */
 .card {
+  background: #ffffff;
+  border: 2px solid #f3ece6;
+  border-radius: 24px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+  box-shadow: 0 8px 24px rgba(92, 64, 51, 0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
 
-    background: #1a1a1a;
+/* Pestaña de color decorativa en la esquina superior */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, #e67e22, #b97843);
+}
 
-    border-radius: 16px;
-
-    padding: 20px;
-
-    box-shadow:
-        0 6px 18px rgba(0,0,0,0.35);
-
-    display: flex;
-
-    flex-direction: column;
-
-    min-height: 300px;
-
-    transition: all .2s ease;
+/* Si es la sección de pins cambiamos la tonalidad del acento */
+section:nth-of-type(2) .card::before {
+  background: linear-gradient(90deg, #9b59b6, #e74c3c);
 }
 
 .card:hover {
-
-    transform: translateY(-4px);
-
-    box-shadow:
-        0 10px 24px rgba(0,0,0,0.45);
+  transform: translateY(-6px);
+  border-color: #b97843;
+  box-shadow: 0 16px 35px rgba(185, 120, 67, 0.1);
 }
 
+/* Encabezados internos */
 .card h3 {
-
-    margin: 0 0 10px;
-
-    color: #b97843;
-
-    font-size: 22px;
-
-    overflow-wrap: break-word;
-
-    word-break: break-word;
+  margin: 0 0 6px 0;
+  color: #2c1d11;
+  font-size: 1.3rem;
+  font-weight: 700;
 }
 
-.card p {
-
-    margin: 0;
-
-    line-height: 1.5;
-
-    overflow-wrap: break-word;
-
-    word-break: break-word;
-}
-
+/* Badges de rol llenos de color */
 .card span {
-
-    width: fit-content;
-
-    padding: 5px 10px;
-
-    border-radius: 20px;
-
-    background: #2d2d2d;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    color: #b97843;
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  font-size: 11px;
+  font-weight: 800;
+  color: #e65100;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(230, 81, 0, 0.1);
 }
 
+/* Ajuste si el rol es diferente */
+.card span:empty { display: none; }
+
+/* Párrafos e información interna */
+.card p {
+  margin: 0 0 12px 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* Correo electrónico */
 .card p:nth-of-type(1) {
-
-    font-weight: 600;
-
-    max-height: 60px;
-
-    overflow-y: auto;
+  font-weight: 600;
+  color: #7f6a5c;
 }
 
+/* Cuadro de texto para Pins con fondo pastel muy bonito */
 .card p:nth-of-type(2) {
-
-    color: #bdbdbd;
-
-    max-height: 120px;
-
-    overflow-y: auto;
+  color: #4a3525;
+  background: #fdf8f5;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1px dashed #e6ccba;
+  font-size: 0.9rem;
+  max-height: 85px;
+  overflow-y: auto;
 }
 
+/* Botón de acción con transición de color fluida */
 .card button {
-
-    margin-top: auto;
-
-    background: #c0392b;
-
-    border: none;
-
-    border-radius: 10px;
-
-    padding: 12px;
-
-    font-size: 15px;
-
-    font-weight: 600;
-
-    color: white;
-
-    cursor: pointer;
-
-    transition: .2s ease;
+  margin-top: auto;
+  background: #fff5f5;
+  border: 1px solid #ffe3e3;
+  border-radius: 14px;
+  padding: 13px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #e74c3c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease-in-out;
 }
 
 .card button:hover {
-
-    background: #e74c3c;
-
-    transform: scale(1.02);
+  background: #e74c3c;
+  color: #ffffff;
+  border-color: #e74c3c;
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.25);
 }
 
 .card button:active {
-
-    transform: scale(0.98);
+  transform: scale(0.97);
 }
 
+/* Scrollbar minimalista */
 .card p::-webkit-scrollbar {
-
-    width: 6px;
+  width: 4px;
+}
+.card p::-webkit-scrollbar-thumb {
+  background: #e6ccba;
+  border-radius: 4px;
 }
 
-.card p::-webkit-scrollbar-thumb {
-
-    background: #555;
-
-    border-radius: 10px;
+@media (max-width: 992px) {
+  .admin-header-ghost { flex-direction: column; gap: 20px; align-items: flex-start; }
+  .admin-container { padding: 30px 20px; }
 }

@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/Register.css";
+import { FiUserPlus } from "react-icons/fi";
+import Swal from "sweetalert2";
 
 function Register() {
 
@@ -21,15 +23,26 @@ function Register() {
                 password
             });
 
-            alert("Usuario creado correctamente");
+            Swal.fire({
+                title: "¡Cuenta creada!",
+                text: "Tu usuario ha sido registrado correctamente.",
+                icon: "success",
+                confirmButtonColor: "#b97843",
+                background: "#fcfbfa",
+                color: "#38291e"
+            });
 
             navigate("/login");
 
         } catch (error) {
-            alert(
-                error.response?.data?.mensaje ||
-                "Error al registrar usuario"
-            );
+            Swal.fire({
+                title: "Error al registrar",
+                text: error.response?.data?.mensaje || "No se pudo crear la cuenta. Inténtalo de nuevo.",
+                icon: "error",
+                confirmButtonColor: "#b97843",
+                background: "#fcfbfa",
+                color: "#38291e"
+            });
         }
     };
 
@@ -62,7 +75,7 @@ function Register() {
                 />
 
                 <button type="submit">
-                    Registrarse
+                    Registrarse <FiUserPlus style={{ marginLeft: "6px", verticalAlign: "middle" }} />
                 </button>
 
                 <p>
