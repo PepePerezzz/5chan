@@ -45,9 +45,9 @@ function Feed() {
       //Filtrar posts donde categoria, descripcion o texto contenga el término de búsqueda
       const termino = busqueda.toLowerCase();
       const resultados = posts.filter(post =>
-        post.categoria.toLowerCase().includes(termino) ||
-        post.descripcion.toLowerCase().includes(termino) ||
-        post.texto.toLowerCase().includes(termino)
+        (post.categoria || "").toLowerCase().includes(termino) ||
+        (post.descripcion || "").toLowerCase().includes(termino) ||
+        (post.texto || "").toLowerCase().includes(termino)
       );
       setFilteredPosts(resultados);
     }

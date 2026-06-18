@@ -31,7 +31,8 @@ CREATE TABLE `pines` (
   `id_pin` int(11) NOT NULL,
   `categoria` varchar(100) NOT NULL,
   `descripcion` text DEFAULT NULL,
-  `texto` longtext NOT NULL
+  `texto` longtext NOT NULL,
+  `id_usuario` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -82,7 +83,8 @@ INSERT INTO `usuarios` (`id_usuario`, `nombre`, `correo`, `contraseña`, `rol`, 
 -- Indices de la tabla `pines`
 --
 ALTER TABLE `pines`
-  ADD PRIMARY KEY (`id_pin`);
+  ADD PRIMARY KEY (`id_pin`),
+  ADD KEY `id_usuario` (`id_usuario`);
 
 --
 -- Indices de la tabla `tableros`
@@ -129,6 +131,12 @@ ALTER TABLE `usuarios`
 --
 ALTER TABLE `tableros`
   ADD CONSTRAINT `tableros_ibfk_1` FOREIGN KEY (`id_pines`) REFERENCES `pines` (`id_pin`);
+
+--
+-- Filtros para la tabla `pines`
+--
+ALTER TABLE `pines`
+  ADD CONSTRAINT `pines_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
