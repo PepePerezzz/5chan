@@ -101,7 +101,7 @@ function AdminDashboard() {
 
                     Swal.fire({
                         title: "¡Contenido Retirado!",
-                        text: "El pin ha sido purgado con éxito.",
+                        text: "El pin ha sido eliminado con éxito.",
                         icon: "success",
                         confirmButtonColor: "#b97843",
                         background: "#fcfbfa",

@@ -4,11 +4,11 @@ import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import PostCard from "../components/PostCard";
 
-// Importamos los estilos desde la carpeta correspondiente
+
 import "../styles/Feed.css"; 
 import "../styles/Profile.css"; 
 
-// Importamos iconos estilizados
+
 import { FiGrid, FiFolder, FiBookmark, FiUser, FiMail, FiLayers } from "react-icons/fi";
 
 function Profile() {
@@ -33,7 +33,11 @@ function Profile() {
           signal: abortController.signal,
           headers: { Authorization: `Bearer ${token}` }
         });
-        setUserPins(res.data);
+        
+        // Filtramos comparando el id_usuario del pin con el id de la sesión actual
+        const misPinesFiltrados = res.data.filter(pin => pin.id_usuario === user?.id);
+        
+        setUserPins(misPinesFiltrados);
         setLoading(false);
       } catch (error) {
         if (!axios.isCancel(error)) {
@@ -43,15 +47,17 @@ function Profile() {
       }
     };
 
-    fetchMyPins();
+    if (user?.id) {
+      fetchMyPins();
+    }
+    
     return () => abortController.abort();
-  }, []);
+  }, [user]);
 
   return (
     <div className="profile-page">
       <Navbar />
       
-      {/* Encabezado del Perfil */}
       <div className="profile-header">
         <div className="avatar-wrapper">
           <div className="avatar-box">
@@ -85,7 +91,7 @@ function Profile() {
         </div>
       </div>
 
-      {/* Selector de Pestañas */}
+      
       <div className="tab-container">
         <button 
           className={`tab-btn ${activeTab === "pins" ? "active" : ""}`}
@@ -101,7 +107,7 @@ function Profile() {
         </button>
       </div>
 
-      {/* Contenedor Dinámico */}
+     
       <div className="feed-container">
         {loading ? (
           <div className="info-message">Cargando tu colección...</div>
@@ -124,7 +130,7 @@ function Profile() {
             </div>
           )
         ) : (
-          /* Renderizado de Tableros con hover nativo de CSS */
+          
           <div className="board-grid">
             {mockBoards.map((board) => (
               <div key={board.id} className="board-card">

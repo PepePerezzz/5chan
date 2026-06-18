@@ -1,6 +1,6 @@
 const db = require("../config/db");
 
-// GET pins
+
 const getPins = async (req, res) => {
     try {
         const [rows] = await db.execute(
@@ -16,34 +16,36 @@ const getPins = async (req, res) => {
     }
 };
 
-// CREATE pin
+// crea el pin y esta vinculado al id_usuario del Token
 const createPin = async (req, res) => {
     try {
         const { categoria, descripcion, texto } = req.body;
+        const id_usuario = req.usuario.id; 
 
         const [result] = await db.execute(
-            "INSERT INTO pines (categoria, descripcion, texto) VALUES (?, ?, ?)",
-            [categoria, descripcion, texto]
+            "INSERT INTO pines (categoria, descripcion, texto, id_usuario) VALUES (?, ?, ?, ?)",
+            [categoria, descripcion, texto, id_usuario]
         );
 
         res.status(201).json({
             id_pin: result.insertId,
+            id_usuario,
             categoria,
             descripcion,
             texto
         });
 
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             mensaje: "Error al crear pin"
         });
     }
 };
+
 // ELIMINAR PIN (ADMIN)
 const deletePin = async (req, res) => {
-
     try {
-
         const { id } = req.params;
 
         await db.execute(
@@ -56,15 +58,11 @@ const deletePin = async (req, res) => {
         });
 
     } catch (error) {
-
         console.log(error);
-
         res.status(500).json({
             mensaje: "Error al eliminar pin"
         });
-
     }
-
 };
 
 module.exports = {
