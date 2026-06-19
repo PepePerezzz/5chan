@@ -8,6 +8,7 @@ import "../styles/Feed.css";
 import { useAuth } from "../context/AuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PinCarousel from "../components/PinCarousel";
 
 function Feed() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -109,15 +110,20 @@ return (
       <Navbar />
       <ToastContainer />
 
+      <PinCarousel posts={filteredPosts.slice(0, 8)} />
+
       <div className="feed-container">
         <div className="masonry">
           {filteredPosts.length > 0 ? (
             filteredPosts.map((post) => (
               <PostCard
                 key={post.id_pin}
+                idPin={post.id_pin}
                 author={post.categoria}
                 category={post.descripcion}
                 text={post.texto}
+                autorNombre={post.autor_nombre}
+                idUsuarioAutor={post.id_usuario}
               />
             ))
           ) : (

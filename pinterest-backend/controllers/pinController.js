@@ -4,7 +4,10 @@ const db = require("../config/db");
 const getPins = async (req, res) => {
     try {
         const [rows] = await db.execute(
-            "SELECT * FROM pines ORDER BY id_pin DESC"
+            `SELECT p.*, u.nombre AS autor_nombre
+             FROM pines p
+             LEFT JOIN usuarios u ON p.id_usuario = u.id_usuario
+             ORDER BY p.id_pin DESC`
         );
 
         res.json(rows);
@@ -20,7 +23,7 @@ const getPins = async (req, res) => {
 const createPin = async (req, res) => {
     try {
         const { categoria, descripcion, texto } = req.body;
-        const id_usuario = req.usuario.id; 
+        const id_usuario = req.usuario.id;
 
         const [result] = await db.execute(
             "INSERT INTO pines (categoria, descripcion, texto, id_usuario) VALUES (?, ?, ?, ?)",
@@ -29,14 +32,13 @@ const createPin = async (req, res) => {
 
         res.status(201).json({
             id_pin: result.insertId,
-            id_usuario,
             categoria,
             descripcion,
-            texto
+            texto,
+            id_usuario
         });
 
     } catch (error) {
-        console.error(error);
         res.status(500).json({
             mensaje: "Error al crear pin"
         });

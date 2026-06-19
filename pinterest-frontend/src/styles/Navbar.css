@@ -174,3 +174,41 @@
 .logout-btn:hover {
   opacity: 0.9;
 }
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  z-index: 200;
+}
+
+.search-dropdown-label {
+  font-size: 11px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 4px 8px 6px 8px;
+}
+
+.search-dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 10px 8px;
+  font-size: 14px;
+  color: #5a3d24;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.search-dropdown-item:hover {
+  background: #f5ede4;
+}

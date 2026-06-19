@@ -3,6 +3,7 @@ const router = express.Router();
 
 const verificarToken = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/authorizeRoles");
+
 const {
     getUsers,
     deleteUser

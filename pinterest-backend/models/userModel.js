@@ -31,7 +31,26 @@ const buscarPorCorreo = async (correo) => {
 
     return rows;
 };
+
+const buscarPorNombre = async (nombre) => {
+
+    const sql = `
+        SELECT id_usuario, nombre, rol
+        FROM usuarios
+        WHERE nombre LIKE ?
+        LIMIT 8
+    `;
+
+    const [rows] = await db.execute(
+        sql,
+        [`%${nombre}%`]
+    );
+
+    return rows;
+};
+
 module.exports = {
     crearUsuario,
-    buscarPorCorreo
+    buscarPorCorreo,
+    buscarPorNombre
 };

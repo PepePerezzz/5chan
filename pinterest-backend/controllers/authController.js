@@ -119,7 +119,28 @@ const login = async (req, res) => {
 
 };
 
+const buscarUsuarios = async (req, res) => {
+    try {
+        const { nombre } = req.query;
+
+        if (!nombre || nombre.trim().length < 2) {
+            return res.json([]);
+        }
+
+        const usuarios = await User.buscarPorNombre(nombre.trim());
+
+        res.json(usuarios);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            mensaje: "Error al buscar usuarios"
+        });
+    }
+};
+
 module.exports = {
     register,
+    buscarUsuarios,
     login
 };

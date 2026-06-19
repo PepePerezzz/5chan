@@ -16,6 +16,7 @@ function App() {
         <Route path="/" element={<Feed />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/profile/:id_usuario" element={<Profile />} />
         
         //Ruta con parámetros dinamicos (:id) para ver un pin a detalle
         <Route path="/pin/:id" element={<PinDetail />} />

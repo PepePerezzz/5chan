@@ -4,11 +4,14 @@ const router = express.Router();
 const verificarToken = require("../middleware/authMiddleware");
 const {
     register,
-    login
+    login,
+    buscarUsuarios 
 } = require("../controllers/authController");
 
+router.get("/buscar", buscarUsuarios);
 router.post("/register", register);
 router.post("/login", login);
+
 router.get(
     "/perfil",
     verificarToken,
