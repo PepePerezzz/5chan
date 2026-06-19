@@ -8,6 +8,7 @@ import "../styles/Feed.css";
 import { useAuth } from "../context/AuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import api from "../services/api";
 
 function Feed() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,7 +21,7 @@ function Feed() {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/pins')
+    api.get('/pins')
       .then((respuesta) => {
         setPosts(respuesta.data);
         setLoading(false);
@@ -65,8 +66,8 @@ function Feed() {
 
       const token = localStorage.getItem("token");
 
-      const respuesta = await axios.post(
-        "http://localhost:3000/api/pins",
+      const respuesta = await api.post(
+        "/pins",
         datosParaBD,
         {
           headers: {
@@ -108,8 +109,8 @@ function Feed() {
 
       const token = localStorage.getItem("token");
 
-      const respuesta = await axios.put(
-        `http://localhost:3000/api/pins/${editingPost.id_pin}`,
+      const respuesta = await api.put(
+        `/pins/${editingPost.id_pin}`,
         datosParaBD,
         {
           headers: {

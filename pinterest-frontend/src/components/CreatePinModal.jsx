@@ -13,6 +13,12 @@ function CreatePinModal({ isOpen, onClose, onCreatePin, initialData = null, mode
       setCategory(initialData.categoria || '');
       setDescription(initialData.descripcion || '');
       setText(initialData.texto || '');
+    } else if (mode === 'create') {
+      // Limpiar campos cuando se abre en modo crear
+      setCategory('');
+      setDescription('');
+      setText('');
+      setError('');
     }
   }, [initialData, mode, isOpen]);
 

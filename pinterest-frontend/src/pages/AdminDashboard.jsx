@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import Navbar from "../components/Navbar";
 import "../styles/AdminDashboard.css";
 
@@ -18,7 +18,7 @@ function AdminDashboard() {
     }, []);
 
     const fetchUsers = async () => {
-        const res = await axios.get("http://localhost:3000/api/users", {
+        const res = await api.get("/users", {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -27,7 +27,7 @@ function AdminDashboard() {
     };
 
     const fetchPins = async () => {
-        const res = await axios.get("http://localhost:3000/api/pins/admin", {
+        const res = await api.get("/pins/admin", {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -50,7 +50,7 @@ function AdminDashboard() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`http://localhost:3000/api/users/${id}`, {
+                    await api.delete(`/users/${id}`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }
@@ -92,7 +92,7 @@ function AdminDashboard() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`http://localhost:3000/api/pins/${id}`, {
+                    await api.delete(`/pins/${id}`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }

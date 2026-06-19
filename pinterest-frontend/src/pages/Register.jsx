@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import "../styles/Register.css";
 import { FiUserPlus } from "react-icons/fi";
 import Swal from "sweetalert2";
+import api from "../services/api";
 
 function Register() {
 
@@ -17,7 +18,7 @@ function Register() {
         e.preventDefault();
 
         try {
-            await axios.post("http://localhost:3000/api/auth/register", {
+            await api.post("/auth/register", {
                 nombre,
                 correo,
                 password

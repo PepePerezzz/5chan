@@ -3,7 +3,10 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import PostCard from "../components/PostCard";
-
+import CreatePinModal from "../components/CreatePinModal";
+import api from "../services/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import "../styles/Feed.css"; 
 import "../styles/Profile.css"; 
@@ -16,6 +19,9 @@ function Profile() {
   const [userPins, setUserPins] = useState([]);
   const [activeTab, setActiveTab] = useState("pins"); 
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('create');
+  const [editingPost, setEditingPost] = useState(null);
 
   const mockBoards = [
     { id: 1, nombre: "Frases", conteo: 0 },
@@ -29,14 +35,19 @@ function Profile() {
 
     const fetchMyPins = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/pins", {
+        const res = await api.get("/pins", {
           signal: abortController.signal,
           headers: { Authorization: `Bearer ${token}` }
         });
-        
+        console.log("TODOS LOS PINES:", res.data);
+        console.log("USER PROFILE:", user);
+
         // Filtramos comparando el id_usuario del pin con el id de la sesión actual
-        const misPinesFiltrados = res.data.filter(pin => pin.id_usuario === user?.id);
-        
+        const misPinesFiltrados = res.data.filter(
+          pin => pin.id_usuario === user.id
+        ); 
+        console.log("MIS PINES:", misPinesFiltrados);
+   
         setUserPins(misPinesFiltrados);
         setLoading(false);
       } catch (error) {
@@ -54,9 +65,57 @@ function Profile() {
     return () => abortController.abort();
   }, [user]);
 
+  const handleUpdatePost = async (updatedData) => {
+    try {
+      if (!editingPost) return;
+
+      const datosParaBD = {
+        categoria: updatedData.category,
+        descripcion: updatedData.description,
+        texto: updatedData.text
+      };
+
+      const token = localStorage.getItem("token");
+
+      const respuesta = await api.put(
+        `/pins/${editingPost.id_pin}`,
+        datosParaBD,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      const updatedPost = respuesta.data;
+
+      setUserPins(userPins.map(p => (p.id_pin === updatedPost.id_pin ? { ...p, ...updatedPost } : p)));
+
+      toast.success("Pin actualizado correctamente", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+      });
+
+      setEditingPost(null);
+      setModalMode('create');
+
+    } catch (error) {
+      console.error("Error al actualizar el pin:", error);
+      toast.error("Error: No se pudo conectar con el servidor o falló la actualización.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+      });
+    }
+  };
+
   return (
     <div className="profile-page">
       <Navbar />
+      <ToastContainer />
       
       <div className="profile-header">
         <div className="avatar-wrapper">
@@ -122,9 +181,12 @@ function Profile() {
               {userPins.map((pin) => (
                 <PostCard
                   key={pin.id_pin}
-                  author={pin.categoria}
-                  category={pin.descripcion}
-                  text={pin.texto}
+                  post={pin}
+                  onEdit={(p) => {
+                    setEditingPost(p);
+                    setModalMode('edit');
+                    setIsModalOpen(true);
+                  }}
                 />
               ))}
             </div>
@@ -146,6 +208,14 @@ function Profile() {
           </div>
         )}
       </div>
+
+      <CreatePinModal
+        isOpen={isModalOpen}
+        onClose={() => { setIsModalOpen(false); }}
+        onCreatePin={handleUpdatePost}
+        initialData={modalMode === 'edit' ? editingPost : null}
+        mode={modalMode}
+      />
     </div>
   );
 }

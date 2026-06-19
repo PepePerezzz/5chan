@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/Login.css";
+import api from "../services/api";
 
 import { FiArrowLeft, FiLogIn, FiUserPlus } from "react-icons/fi";
 import Swal from "sweetalert2";
@@ -16,8 +17,8 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(
-                "http://localhost:3000/api/auth/login",
+            const response = await api.post(
+                "/auth/login",
                 {
                     correo,
                     password
