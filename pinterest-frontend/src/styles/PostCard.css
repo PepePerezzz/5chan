@@ -50,3 +50,19 @@
   color: #767676;
   font-weight: bold;
 }
+
+.post-edit-btn {
+  margin-top: 10px;
+  background: transparent;
+  border: 1px solid #b97843;
+  color: #b97843;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.post-edit-btn:hover {
+  background: #b97843;
+  color: white;
+}

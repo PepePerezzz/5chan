@@ -1,11 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/CreatePinModal.css'; 
 
-function CreatePinModal({ isOpen, onClose, onCreatePin }) {
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
-  const [text, setText] = useState('');
+function CreatePinModal({ isOpen, onClose, onCreatePin, initialData = null, mode = 'create' }) {
+  const [category, setCategory] = useState(initialData ? initialData.categoria : '');
+  const [description, setDescription] = useState(initialData ? initialData.descripcion : '');
+  const [text, setText] = useState(initialData ? initialData.texto : '');
   const [error, setError] = useState('');
+
+  // sincronizar campos cuando cambie initialData o se abra el modal en modo edit
+  useEffect(() => {
+    if (mode === 'edit' && initialData) {
+      setCategory(initialData.categoria || '');
+      setDescription(initialData.descripcion || '');
+      setText(initialData.texto || '');
+    }
+  }, [initialData, mode, isOpen]);
 
   if (!isOpen) return null;
 
@@ -27,9 +36,11 @@ function CreatePinModal({ isOpen, onClose, onCreatePin }) {
 
     onCreatePin(newPin);
 
-    setCategory('');
-    setDescription('');
-    setText('');
+    if (mode === 'create') {
+      setCategory('');
+      setDescription('');
+      setText('');
+    }
     onClose();
   };
 
@@ -38,7 +49,7 @@ function CreatePinModal({ isOpen, onClose, onCreatePin }) {
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose}>✕</button>
         
-        <h2 className="modal-title">Crear Nuevo Pin de Texto</h2>
+        <h2 className="modal-title">{mode === 'edit' ? 'Editar Pin' : 'Crear Nuevo Pin de Texto'}</h2>
         
         {error && <p className="modal-error-text">{error}</p>}
 
@@ -70,7 +81,7 @@ function CreatePinModal({ isOpen, onClose, onCreatePin }) {
             rows="5"
           />
 
-          <button type="submit" className="modal-submit-btn">Publicar Pin</button>
+          <button type="submit" className="modal-submit-btn">{mode === 'edit' ? 'Guardar cambios' : 'Publicar Pin'}</button>
         </form>
       </div>
     </div>
