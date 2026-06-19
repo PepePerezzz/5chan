@@ -8,6 +8,7 @@ const {
     getPins,
     createPin,
     deletePin,
+    updatePin,
 } = require("../controllers/pinController");
 
 // público (feed)
@@ -33,6 +34,14 @@ router.delete(
   verificarToken,
   authorizeRoles("admin"),
   deletePin
+);
+
+// actualizar pin (propietario o admin)
+router.put(
+  "/:id",
+  verificarToken,
+  authorizeRoles("usuario", "admin"),
+  updatePin
 );
 
 module.exports = router;

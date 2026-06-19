@@ -11,38 +11,32 @@ import "react-toastify/dist/ReactToastify.css";
 
 function Feed() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('create');
+  const [editingPost, setEditingPost] = useState(null);
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
-  //useEffect para pedir los textos al Backend en cuanto cargue la pagina
+
   useEffect(() => {
-    //Axios con una Promesa (.then / .catch)
-    axios.get('http://localhost:3000/api/pins') //se crea la Promesa
-    .then((respuesta) => {
-    //Si la promesa se CUMPLE (Fulfilled), entramos aqui
-    //Recibimos los los datos de MySQL y los guardamos
-    setPosts(respuesta.data); 
-    setLoading(false);
-  })
-  .catch((error) => {
-    //si la promesa se RECHAZA, brinca directo aqui
-    // Atrapamos el error y avisamos al usuario.
-    console.error(error);
-    setLoading(false);
-  });
+    axios.get('http://localhost:3000/api/pins')
+      .then((respuesta) => {
+        setPosts(respuesta.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoading(false);
+      });
   }, []);
 
-  //useEffect para filtrar posts según el parámetro de búsqueda
   useEffect(() => {
     const busqueda = searchParams.get('busqueda');
 
     if (!busqueda || busqueda.trim() === '') {
-      //Si no hay parámetro de búsqueda, mostrar todos los posts
       setFilteredPosts(posts);
     } else {
-      //Filtrar posts donde categoria, descripcion o texto contenga el término de búsqueda
       const termino = busqueda.toLowerCase();
       const resultados = posts.filter(post =>
         (post.categoria || "").toLowerCase().includes(termino) ||
@@ -52,6 +46,7 @@ function Feed() {
       setFilteredPosts(resultados);
     }
   }, [searchParams, posts]);
+
   if (loading) {
     return (
       <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -60,51 +55,95 @@ function Feed() {
     );
   }
 
+  const handleCreatePost = async (newPostData) => {
+    try {
+      const datosParaBD = {
+        categoria: newPostData.category,
+        descripcion: newPostData.description,
+        texto: newPostData.text
+      };
 
-const handleCreatePost = async (newPostData) => {
-  try {
+      const token = localStorage.getItem("token");
 
-    const datosParaBD = {
-      categoria: newPostData.category,
-      descripcion: newPostData.description,
-      texto: newPostData.text
-    };
-
-    const token = localStorage.getItem("token");
-
-    const respuesta = await axios.post(
-      "http://localhost:3000/api/pins",
-      datosParaBD,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const respuesta = await axios.post(
+        "http://localhost:3000/api/pins",
+        datosParaBD,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
-    );
+      );
 
-    const postGuardado = respuesta.data;
-    setPosts([postGuardado, ...posts]);
+      const postGuardado = respuesta.data;
+      setPosts([postGuardado, ...posts]);
 
-    toast.success("¡Pensamiento guardado con exito!", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-    });
+      toast.success("¡Pensamiento guardado con exito!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+      });
 
-  } catch (error) {
-    console.error("Error al guardar en la base de datos:", error);
-    toast.error("Error: No se pudo conectar con el servidor o falló el guardado.", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-    });
-  }
-};
+    } catch (error) {
+      console.error("Error al guardar en la base de datos:", error);
+      toast.error("Error: No se pudo conectar con el servidor o falló el guardado.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+      });
+    }
+  };
 
-return (
-    // un div relativo para que el boton pueda flotar
+  const handleUpdatePost = async (updatedData) => {
+    try {
+      if (!editingPost) return;
+
+      const datosParaBD = {
+        categoria: updatedData.category,
+        descripcion: updatedData.description,
+        texto: updatedData.text
+      };
+
+      const token = localStorage.getItem("token");
+
+      const respuesta = await axios.put(
+        `http://localhost:3000/api/pins/${editingPost.id_pin}`,
+        datosParaBD,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      const updatedPost = respuesta.data;
+
+      setPosts(posts.map(p => (p.id_pin === updatedPost.id_pin ? { ...p, ...updatedPost } : p)));
+
+      toast.success("Pin actualizado correctamente", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+      });
+
+      setEditingPost(null);
+      setModalMode('create');
+
+    } catch (error) {
+      console.error("Error al actualizar el pin:", error);
+      toast.error("Error: No se pudo conectar con el servidor o falló la actualización.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+      });
+    }
+  };
+
+  return (
     <div style={{ position: "relative", minHeight: "100vh" }}>
       <Navbar />
       <ToastContainer />
@@ -115,9 +154,12 @@ return (
             filteredPosts.map((post) => (
               <PostCard
                 key={post.id_pin}
-                author={post.categoria}
-                category={post.descripcion}
-                text={post.texto}
+                post={post}
+                onEdit={(p) => {
+                  setEditingPost(p);
+                  setModalMode('edit');
+                  setIsModalOpen(true);
+                }}
               />
             ))
           ) : (
@@ -130,12 +172,11 @@ return (
         </div>
       </div>
 
-      {/* 4. BOTÓN FLOTANTE: Diseñado con CSS en línea para no alterar el archivo Feed.css de tu compañero */}
       {user && (
         <>
           <button
             style={floatingButtonStyle}
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => { setIsModalOpen(true); setModalMode('create'); setEditingPost(null); }}
             title="Crear nuevo pin de texto"
           >
             +
@@ -143,8 +184,10 @@ return (
 
           <CreatePinModal
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onCreatePin={handleCreatePost}
+            onClose={() => { setIsModalOpen(false); }}
+            onCreatePin={modalMode === 'edit' ? handleUpdatePost : handleCreatePost}
+            initialData={modalMode === 'edit' ? editingPost : null}
+            mode={modalMode}
           />
         </>
       )}
