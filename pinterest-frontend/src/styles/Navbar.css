@@ -144,6 +144,12 @@
   background: #f8f1ea;
 }
 
+.dropdown-item.active {
+  background: #f0e6dc;
+  color: #5c4033;
+  font-weight: 700;
+}
+
 .dropdown-item.logout {
   background: none;
   border: none;

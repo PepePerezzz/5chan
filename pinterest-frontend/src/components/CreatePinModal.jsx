@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import '../styles/CreatePinModal.css'; 
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import '../styles/CreatePinModal.css';
 
 function CreatePinModal({ isOpen, onClose, onCreatePin, initialData = null, mode = 'create' }) {
   const [category, setCategory] = useState(initialData ? initialData.categoria : '');
@@ -93,5 +94,17 @@ function CreatePinModal({ isOpen, onClose, onCreatePin, initialData = null, mode
     </div>
   );
 }
+
+CreatePinModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onCreatePin: PropTypes.func.isRequired,
+  initialData: PropTypes.shape({
+    categoria: PropTypes.string,
+    descripcion: PropTypes.string,
+    texto: PropTypes.string
+  }),
+  mode: PropTypes.oneOf(['create', 'edit'])
+};
 
 export default CreatePinModal;

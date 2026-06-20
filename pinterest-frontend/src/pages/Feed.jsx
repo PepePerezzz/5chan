@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom"; 
-import axios from "axios";
+import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import PostCard from "../components/PostCard";
 import Navbar from "../components/Navbar";
 import CreatePinModal from "../components/CreatePinModal";
+import SaveToBoardModal from "../components/SaveToBoardModal";
+import Loader from "../components/Loader";
+import usePins from "../hooks/usePins";
+import useBoards from "../hooks/useBoards";
 import "../styles/Feed.css";
 import { useAuth } from "../context/AuthContext";
 import { ToastContainer, toast } from "react-toastify";
@@ -11,49 +14,41 @@ import "react-toastify/dist/ReactToastify.css";
 import api from "../services/api";
 
 function Feed() {
+  const { user } = useAuth();
+
+  // Carga de pines centralizada en el hook personalizado usePins.
+  const { pins: posts, setPins: setPosts, loading } = usePins();
+  // Tableros del usuario (para el modal "Guardar en tablero").
+  const { boards, addPinToBoard } = useBoards();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [editingPost, setEditingPost] = useState(null);
-  const [posts, setPosts] = useState([]);
-  const [filteredPosts, setFilteredPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
   const [searchParams] = useSearchParams();
 
-  useEffect(() => {
-    api.get('/pins')
-      .then((respuesta) => {
-        setPosts(respuesta.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
-      });
-  }, []);
+  // Estado del modal "Guardar en tablero".
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [pinToSave, setPinToSave] = useState(null);
+  const [savingBoard, setSavingBoard] = useState(false);
 
-  useEffect(() => {
+  // Filtrado derivado de los pines + el query param ?busqueda (sin estado extra).
+  const filteredPosts = useMemo(() => {
     const busqueda = searchParams.get('busqueda');
 
     if (!busqueda || busqueda.trim() === '') {
-      setFilteredPosts(posts);
-    } else {
-      const termino = busqueda.toLowerCase();
-      const resultados = posts.filter(post =>
-        (post.categoria || "").toLowerCase().includes(termino) ||
-        (post.descripcion || "").toLowerCase().includes(termino) ||
-        (post.texto || "").toLowerCase().includes(termino)
-      );
-      setFilteredPosts(resultados);
+      return posts;
     }
+
+    const termino = busqueda.toLowerCase();
+    return posts.filter(post =>
+      (post.categoria || "").toLowerCase().includes(termino) ||
+      (post.descripcion || "").toLowerCase().includes(termino) ||
+      (post.texto || "").toLowerCase().includes(termino)
+    );
   }, [searchParams, posts]);
 
   if (loading) {
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <h2>Cargando pensamientos desde la base de datos... </h2>
-      </div>
-    );
+    return <Loader message="Cargando pensamientos desde la base de datos..." />;
   }
 
   const handleCreatePost = async (newPostData) => {
@@ -69,11 +64,7 @@ function Feed() {
       const respuesta = await api.post(
         "/pins",
         datosParaBD,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       const postGuardado = respuesta.data;
@@ -112,11 +103,7 @@ function Feed() {
       const respuesta = await api.put(
         `/pins/${editingPost.id_pin}`,
         datosParaBD,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       const updatedPost = respuesta.data;
@@ -144,6 +131,42 @@ function Feed() {
     }
   };
 
+  const openSaveModal = (post) => {
+    setPinToSave(post);
+    setSaveModalOpen(true);
+  };
+
+  const handleSaveToBoard = async (boardId) => {
+    if (!pinToSave) return;
+    try {
+      setSavingBoard(true);
+      await addPinToBoard(boardId, pinToSave.id_pin);
+      toast.success("Pin guardado en el tablero", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+      });
+      setSaveModalOpen(false);
+      setPinToSave(null);
+    } catch (error) {
+      if (error.response?.status === 409) {
+        toast.info("Ese pin ya está en el tablero", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        console.error("Error al guardar el pin en el tablero:", error);
+        toast.error("No se pudo guardar el pin en el tablero.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } finally {
+      setSavingBoard(false);
+    }
+  };
+
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>
       <Navbar />
@@ -161,6 +184,7 @@ function Feed() {
                   setModalMode('edit');
                   setIsModalOpen(true);
                 }}
+                onSave={user ? openSaveModal : undefined}
               />
             ))
           ) : (
@@ -190,6 +214,14 @@ function Feed() {
             initialData={modalMode === 'edit' ? editingPost : null}
             mode={modalMode}
           />
+
+          <SaveToBoardModal
+            isOpen={saveModalOpen}
+            onClose={() => { setSaveModalOpen(false); setPinToSave(null); }}
+            boards={boards}
+            onSave={handleSaveToBoard}
+            loading={savingBoard}
+          />
         </>
       )}
     </div>
@@ -201,7 +233,7 @@ const floatingButtonStyle = {
   position: "fixed",
   bottom: "40px",
   right: "40px",
-  backgroundColor: "#b97843", 
+  backgroundColor: "#b97843",
   color: "white",
   border: "none",
   width: "60px",
@@ -215,7 +247,7 @@ const floatingButtonStyle = {
   justifyContent: "center",
   alignItems: "center",
   transition: "transform 0.2s ease",
-  zIndex: 999, 
+  zIndex: 999,
 };
 
 export default Feed;
