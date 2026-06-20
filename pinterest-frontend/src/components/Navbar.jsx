@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/Navbar.css";
 
 function Navbar() {
@@ -76,14 +76,20 @@ function Navbar() {
             {openMenu && (
               <div className="dropdown">
 
-                <Link to="/profile" className="dropdown-item">
+                <NavLink
+                  to="/profile"
+                  className={({ isActive }) => "dropdown-item" + (isActive ? " active" : "")}
+                >
                   Perfil
-                </Link>
+                </NavLink>
 
                 {user.rol === "admin" && (
-                  <Link to="/admin" className="dropdown-item">
+                  <NavLink
+                    to="/admin"
+                    className={({ isActive }) => "dropdown-item" + (isActive ? " active" : "")}
+                  >
                     Panel Admin
-                  </Link>
+                  </NavLink>
                 )}
 
                 <button
@@ -98,9 +104,12 @@ function Navbar() {
 
           </div>
         ) : (
-          <Link className="login-btn" to="/login">
+          <NavLink
+            className={({ isActive }) => "login-btn" + (isActive ? " active" : "")}
+            to="/login"
+          >
             Iniciar sesión
-          </Link>
+          </NavLink>
         )}
 
       </div>

@@ -44,7 +44,21 @@ CREATE TABLE `pines` (
 CREATE TABLE `tableros` (
   `id_tablero` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
-  `id_pines` int(11) DEFAULT NULL
+  `id_usuario` int(11) NOT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tablero_pines` (relación N:M tableros<->pines)
+--
+
+CREATE TABLE `tablero_pines` (
+  `id_tablero_pin` int(11) NOT NULL,
+  `id_tablero` int(11) NOT NULL,
+  `id_pin` int(11) NOT NULL,
+  `fecha_guardado` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -91,7 +105,15 @@ ALTER TABLE `pines`
 --
 ALTER TABLE `tableros`
   ADD PRIMARY KEY (`id_tablero`),
-  ADD KEY `id_pines` (`id_pines`);
+  ADD KEY `id_usuario` (`id_usuario`);
+
+--
+-- Indices de la tabla `tablero_pines`
+--
+ALTER TABLE `tablero_pines`
+  ADD PRIMARY KEY (`id_tablero_pin`),
+  ADD UNIQUE KEY `uq_tablero_pin` (`id_tablero`,`id_pin`),
+  ADD KEY `id_pin` (`id_pin`);
 
 --
 -- Indices de la tabla `usuarios`
@@ -117,6 +139,12 @@ ALTER TABLE `tableros`
   MODIFY `id_tablero` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `tablero_pines`
+--
+ALTER TABLE `tablero_pines`
+  MODIFY `id_tablero_pin` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -130,7 +158,14 @@ ALTER TABLE `usuarios`
 -- Filtros para la tabla `tableros`
 --
 ALTER TABLE `tableros`
-  ADD CONSTRAINT `tableros_ibfk_1` FOREIGN KEY (`id_pines`) REFERENCES `pines` (`id_pin`);
+  ADD CONSTRAINT `tableros_usuario_fk` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `tablero_pines`
+--
+ALTER TABLE `tablero_pines`
+  ADD CONSTRAINT `tp_tablero_fk` FOREIGN KEY (`id_tablero`) REFERENCES `tableros` (`id_tablero`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tp_pin_fk` FOREIGN KEY (`id_pin`) REFERENCES `pines` (`id_pin`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `pines`

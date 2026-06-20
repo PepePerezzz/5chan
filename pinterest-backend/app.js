@@ -5,6 +5,7 @@ const app = express();
 const authRoutes = require("./routes/authRoutes");
 const pinRoutes = require("./routes/pinRoutes");
 const userRoutes = require("./routes/userRoutes");
+const boardRoutes = require("./routes/boardRoutes");
 
 const PORT = process.env.PORT || 3000;
 
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/pins", pinRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/boards", boardRoutes);
 
 app.listen(PORT, () => {
     console.log(`Servidor en puerto ${PORT}`);
